@@ -1,0 +1,47 @@
+<html>
+<head>
+<title>DotOne v4 UNPACKER</title>
+<style>
+body{background-color:black;color:white;font-family:arial;}
+textarea{color:white;background-color:#333;font-family:arial;width:80%;height:40%;padding:10px;transition:.3s;border-radius:5px;}
+button{text-align:center;color:white;background-color:#333;border:1px solid white;border-radius:5px;padding:10px;width:50%;transition:.3s;}
+textarea:hover,button:hover{background-color:#555;}
+textarea:active,button:active{background-color:#777;}
+button:hover{width:60%;}
+textarea::placeholder{font-size:50px;text-align:center;color:white;}
+h3{color:#f88;}
+</style>
+</head>
+<body>
+<center>
+<br><br>
+<h1>DotOne v4 UNPACKER</h1>
+<h3>The website might be frozen or you may see the not responding message, just ignore it.</h3>
+<br>
+<textarea id="string" placeholder="Drag and drop packed files here then press Unpack"></textarea>
+<br><br><br>
+<button onclick="startUnpacking()">Unpack</button>
+</center>
+<script type="text/javascript" src="./jszip.js"></script>
+<script>
+var unpackedFiles;
+var pkgName;
+async function downloadZip(f,c){var e=document.createElement("a");await e.setAttribute("href","data:application/zip;base64,"+c);e.setAttribute("download",f);e.style.display="none";document.body.appendChild(e);e.click();document.body.removeChild(e);}
+async function unpackFile(str){var res="";str=await str.split(/(?=(?:..)*$)/);await str.forEach(hex=>{res+=String.fromCharCode(parseInt(hex,16));});return res;}
+async function downloadUnpacked(zipName){unpackedFiles.generateAsync({type:"base64"}).then(function(content){downloadZip(`${zipName.replace(/[^0-9a-zA-Z]/g,"")}.zip`,content);});}
+async function unpackFiles(encoded){
+unpackedFiles=new JSZip();
+let cache=await encoded.split("[F]");
+let packedFiles={};
+pkgName=cache[0].split("\n")[1];
+await cache.forEach(file=>{if(file.includes("[C]")){var name=file.split("[C]")[0];var content=file.split("[C]")[1];packedFiles[name]=content;}});
+await Object.keys(packedFiles).forEach(file=>{unpackedFiles.file(file,unpackFile(packedFiles[file]));});
+await downloadUnpacked(pkgName);
+}
+async function startUnpacking(){var string=await document.getElementById("string").value;if(string.startsWith("DotOne package"))unpackFiles(string);}
+var textarea=document.getElementById("string");
+function dropfile(file){var reader=new FileReader();reader.onload=function(e){textarea.value=e.target.result;};reader.readAsText(file,"UTF-8");}
+textarea.ondrop=function(e){e.preventDefault();var file=e.dataTransfer.files[0];dropfile(file);};
+</script>
+</body>
+</html>
