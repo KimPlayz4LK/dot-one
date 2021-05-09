@@ -65,7 +65,7 @@ end if
 for each packedFile in Split(oneFileContent,"[F]")
 if inStr(packedFile,"[C]") then
 packedFileContents=Split(packedFile,"[C]")
-packedFileName=fso.GetParentFolderName(WScript.ScriptFullName)&"\"&"unpacked-files\"&packedFileContents(0)
+packedFileName=folderName&"\"&packedFileContents(0)
 if Right(packedFileName,1)="\" then
 fso.CreateFolder(packedFileName)
 else
