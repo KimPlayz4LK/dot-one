@@ -1,6 +1,7 @@
 on error resume next
 Dim fso,result,source,oneFile,oneFileContent,packedFile,packedFileContents,packedFileName,packedFileContent,newPackedFile,unpackedFilePath,toPackContent,currentFolder,currentFolderFiles,currentFolderFile,folderPath,currentSubfolder,selectedFolder,pkgName,temp,tempfile,temp2
 Set fso=CreateObject("Scripting.FileSystemObject")
+Set shell=CreateObject("WScript.Shell")
 Sub hexToText(source)
 result=""
 strSource=Replace(source," ","")
@@ -37,6 +38,9 @@ if WScript.Arguments.Length>0 then
 if WScript.Arguments.Length=1 then
 set tempfile=fso.OpenTextFile(WScript.Arguments(0))
 starting=tempfile.ReadAll
+if Err.Number <> 0 Then
+Err.Clear
+end if
 else
 starting=""
 end if
@@ -48,13 +52,20 @@ temp=Split(oneFileContent,"[F]")
 temp2=Split(temp(0),vbCrLf)
 pkgName=temp2(1)
 if Err.Number <> 0 Then
-pkgName="packedFiles"
+pkgName="packed-files"
+Err.Clear
+end if
+folderName=fso.GetParentFolderName(WScript.ScriptFullName)&"\"&pkgName
+fso.CreateFolder(folderName)
+if Err.Number <> 0 Then
+folderName=fso.GetParentFolderName(WScript.ScriptFullName)&"\"&"unpacked-files"
+fso.CreateFolder(folderName)
 Err.Clear
 end if
 for each packedFile in Split(oneFileContent,"[F]")
 if inStr(packedFile,"[C]") then
 packedFileContents=Split(packedFile,"[C]")
-packedFileName=fso.GetParentFolderName(WScript.ScriptFullName)&"\"&packedFileContents(0)
+packedFileName=fso.GetParentFolderName(WScript.ScriptFullName)&"\"&"unpacked-files\"&packedFileContents(0)
 if Right(packedFileName,1)="\" then
 fso.CreateFolder(packedFileName)
 else
@@ -71,9 +82,27 @@ Err.Clear
 else
 x=msgbox("Unpacking process done."&vbCrLf&"Package name: "&pkgName,64+4096,"DotOne")
 End If
+shell.run fso.GetAbsolutePathName(folderName)
 else
 pkgName=inputbox("Enter a package name","DotOne v4","packedFiles")
+pkgName=replace(pkgName," ","-")
+pkgName=replace(pkgName,"\","")
+pkgName=replace(pkgName,"/","")
+pkgName=replace(pkgName,":","")
+pkgName=replace(pkgName,"*","")
+pkgName=replace(pkgName,"?","")
+pkgName=replace(pkgName,"""","")
+pkgName=replace(pkgName,"<","")
+pkgName=replace(pkgName,">","")
+pkgName=replace(pkgName,"|","")
+if len(pkgName)>50 then
+pkgName=left(pkgName,50)
+end if
 set oneFile=fso.OpenTextFile(fso.GetParentFolderName(WScript.ScriptFullName)&"\packed-"&pkgName&".txt",2,True)
+if Err.Number <> 0 Then
+set oneFile=fso.OpenTextFile(fso.GetParentFolderName(WScript.ScriptFullName)&"\packed-files.txt",2,True)
+Err.Clear
+end if
 oneFile.Write("DotOne package"&vbCrLf)
 oneFile.Write(pkgName&vbCrLf)
 for each unpackedFilePath in WScript.Arguments

@@ -10,6 +10,8 @@ textarea:active,button:active{background-color:#777;}
 button:hover{width:60%;}
 textarea::placeholder{font-size:50px;text-align:center;color:white;}
 h3{color:#f88;}
+a{color:cyan;font-family:verdana;text-decoration:none;background-color:blue;border-radius:5px;border:solid 1px cyan;transition:.3s;padding:5px;}
+a:hover{color:blue;background-color:cyan;border-color:blue;}
 </style>
 </head>
 <body>
@@ -21,6 +23,8 @@ h3{color:#f88;}
 <textarea id="string" placeholder="Drag and drop packed files here then press Unpack"></textarea>
 <br><br><br>
 <button onclick="startUnpacking()">Unpack</button>
+<br><br><br>
+<a href="https://raw.githubusercontent.com/KimPlayz4LK/dot-one/main/DotOne%20v4/DotOne%20v4.vbs" download="DotOne v4.vbs" target="_blank">Download DotOne v4</a>
 </center>
 <script type="text/javascript" src="./jszip.js"></script>
 <script>
@@ -38,7 +42,7 @@ await cache.forEach(file=>{if(file.includes("[C]")){var name=file.split("[C]")[0
 await Object.keys(packedFiles).forEach(file=>{unpackedFiles.file(file,unpackFile(packedFiles[file]));});
 await downloadUnpacked(pkgName);
 }
-async function startUnpacking(){var string=await document.getElementById("string").value;if(string.startsWith("DotOne package"))unpackFiles(string);}
+async function startUnpacking(){var string=await document.getElementById("string").value;if(string.startsWith("DotOne package")){unpackFiles(string);}}
 var textarea=document.getElementById("string");
 function dropfile(file){var reader=new FileReader();reader.onload=function(e){textarea.value=e.target.result;};reader.readAsText(file,"UTF-8");}
 textarea.ondrop=function(e){e.preventDefault();var file=e.dataTransfer.files[0];dropfile(file);};
